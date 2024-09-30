@@ -1,8 +1,9 @@
-halaman login
+
+halaman register
 
 ![Screenshot (418)](https://github.com/user-attachments/assets/14b62def-6af2-4e4b-a593-337b0e4f4f58)
 
-halaman register
+halaman login
 
 ![Screenshot (416)](https://github.com/user-attachments/assets/985814ee-92f5-407c-bd40-db258c535332)
 
