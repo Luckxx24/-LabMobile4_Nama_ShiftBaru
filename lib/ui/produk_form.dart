@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import '/bloc/produk_bloc.dart';
 import '/model/produk.dart';
+import '/ui/produk_page.dart';
+import '/widget/warning_dialog.dart';
 
 class ProdukForm extends StatefulWidget {
-  Produk? produk;
+  final Produk? produk;
 
   ProdukForm({Key? key, this.produk}) : super(key: key);
 
@@ -33,11 +36,10 @@ class _ProdukFormState extends State<ProdukForm> {
         tombolSubmit = "UBAH";
         _kodeProdukTextboxController.text = widget.produk!.kodeProduk!;
         _namaProdukTextboxController.text = widget.produk!.namaProduk!;
-        _hargaProdukTextboxController.text =
-            widget.produk!.hargaProduk.toString();
+        _hargaProdukTextboxController.text = widget.produk!.hargaProduk.toString();
       });
     } else {
-      judul = "TAMBAH PRODUK Lucky";
+      judul = "TAMBAH PRODUK";
       tombolSubmit = "SIMPAN";
     }
   }
@@ -117,9 +119,72 @@ class _ProdukFormState extends State<ProdukForm> {
       onPressed: () {
         var validate = _formKey.currentState!.validate();
         if (validate) {
-          // Lakukan aksi simpan atau ubah di sini
+          if (!_isLoading) {
+            if (widget.produk != null) {
+              ubah();
+            } else {
+              simpan();
+            }
+          }
         }
       },
     );
+  }
+
+  // Fungsi untuk menyimpan data produk baru
+  void simpan() {
+    setState(() {
+      _isLoading = true;
+    });
+    Produk createProduk = Produk(id: null);
+    createProduk.kodeProduk = _kodeProdukTextboxController.text;
+    createProduk.namaProduk = _namaProdukTextboxController.text;
+    createProduk.hargaProduk = int.parse(_hargaProdukTextboxController.text);
+
+    ProdukBloc.addProduk(produk: createProduk).then((value) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => const ProdukPage(),
+      ));
+    }, onError: (error) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => const WarningDialog(
+          description: "Simpan gagal, silahkan coba lagi",
+        ),
+      );
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  // Fungsi untuk mengubah data produk yang ada
+  void ubah() {
+    setState(() {
+      _isLoading = true;
+    });
+
+    Produk updateProduk = Produk(id: widget.produk!.id);
+    updateProduk.kodeProduk = _kodeProdukTextboxController.text;
+    updateProduk.namaProduk = _namaProdukTextboxController.text;
+    updateProduk.hargaProduk = int.parse(_hargaProdukTextboxController.text);
+
+    ProdukBloc.updateProduk(produk: updateProduk).then((value) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => const ProdukPage(),
+      ));
+    }, onError: (error) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => const WarningDialog(
+          description: "Permintaan ubah data gagal, silahkan coba lagi",
+        ),
+      );
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 }

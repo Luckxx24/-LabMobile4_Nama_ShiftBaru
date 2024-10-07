@@ -3,7 +3,7 @@ import '/model/produk.dart';
 import '/ui/produk_form.dart';
 
 class ProdukDetail extends StatefulWidget {
-  Produk? produk;
+  final Produk? produk;
 
   ProdukDetail({Key? key, this.produk}) : super(key: key);
 
@@ -16,11 +16,10 @@ class _ProdukDetailState extends State<ProdukDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Produk Lucky'),
+        title: const Text('Detail Produk'),
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               "Kode : ${widget.produk!.kodeProduk}",
@@ -34,7 +33,6 @@ class _ProdukDetailState extends State<ProdukDetail> {
               "Harga : Rp. ${widget.produk!.hargaProduk.toString()}",
               style: const TextStyle(fontSize: 18.0),
             ),
-            const SizedBox(height: 20),
             _tombolHapusEdit(),
           ],
         ),
@@ -44,7 +42,6 @@ class _ProdukDetailState extends State<ProdukDetail> {
 
   Widget _tombolHapusEdit() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
         // Tombol Edit
@@ -54,14 +51,11 @@ class _ProdukDetailState extends State<ProdukDetail> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProdukForm(
-                  produk: widget.produk!,
-                ),
+                builder: (context) => ProdukForm(produk: widget.produk!),
               ),
             );
           },
         ),
-        const SizedBox(width: 10), // Jarak antara tombol
         // Tombol Hapus
         OutlinedButton(
           child: const Text("DELETE"),
@@ -79,8 +73,8 @@ class _ProdukDetailState extends State<ProdukDetail> {
         OutlinedButton(
           child: const Text("Ya"),
           onPressed: () {
-            // Implementasi logika hapus data
-            Navigator.pop(context); // Kembali setelah konfirmasi
+            // Logika untuk menghapus produk bisa ditambahkan di sini
+            Navigator.pop(context); // Tutup dialog
           },
         ),
         // Tombol batal
@@ -92,8 +86,8 @@ class _ProdukDetailState extends State<ProdukDetail> {
     );
 
     showDialog(
-      context: context,
       builder: (context) => alertDialog,
+      context: context,
     );
   }
 }

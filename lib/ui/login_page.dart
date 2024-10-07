@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import '/bloc/login_bloc.dart';
+import '/helpers/user_info.dart';
+import '/ui/produk_page.dart';
 import '/ui/registrasi_page.dart';
+import '/widget/warning_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -11,7 +15,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-
   final _emailTextboxController = TextEditingController();
   final _passwordTextboxController = TextEditingController();
 
@@ -19,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login Lucky'),
+        title: const Text('Login'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -60,7 +63,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget _passwordTextField() {
     return TextFormField(
       decoration: const InputDecoration(labelText: "Password"),
-      keyboardType: TextInputType.text,
       obscureText: true,
       controller: _passwordTextboxController,
       validator: (value) {
@@ -78,7 +80,50 @@ class _LoginPageState extends State<LoginPage> {
       child: const Text("Login"),
       onPressed: () {
         var validate = _formKey.currentState!.validate();
+        if (validate && !_isLoading) {
+          _submit();
+        }
       },
+    );
+  }
+
+  // Proses login
+  void _submit() {
+    _formKey.currentState!.save();
+    setState(() {
+      _isLoading = true;
+    });
+
+    LoginBloc.login(
+      email: _emailTextboxController.text,
+      password: _passwordTextboxController.text,
+    ).then((value) async {
+      if (value.code == 200) {
+        await UserInfo().setToken(value.token.toString());
+        await UserInfo().setUserID(int.parse(value.userID.toString()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ProdukPage()),
+        );
+      } else {
+        _showErrorDialog("Login gagal, silahkan coba lagi");
+      }
+    }).catchError((error) {
+      print(error);
+      _showErrorDialog("Login gagal, silahkan coba lagi");
+    }).whenComplete(() {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
+  // Menampilkan dialog error
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => WarningDialog(description: message),
     );
   }
 
